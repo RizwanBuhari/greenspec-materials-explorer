@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Forma · Materials explorer</title>
+    <meta name="description" content="Explore the environmental trade-offs of everyday materials." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Navigation -->
+    <header class="nav">
+      <a class="brand" href="#/" aria-label="Forma home">
+        <span class="brand-mark" data-icon="sprout" data-size="18"></span>
+        <span class="brand-name">forma</span>
+        <span class="brand-descriptor">Material<br />intelligence</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="#/" data-route="explorer">Materials explorer</a>
+        <a href="#/impact" data-route="impact">Understanding impact</a>
+      </nav>
+      <div class="nav-controls">
+        <span class="status-badge">Demo workspace</span>
+        <span class="avatar" title="Signed in as demo user">JD</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ============ Materials explorer ============ -->
+      <section class="page" data-page="explorer">
+        <div class="intro">
+          <div>
+            <p class="eyebrow">The material library</p>
+            <h1 class="page-title">Better choices start with materials.</h1>
+            <p class="page-description">Explore the trade-offs. Select a material to understand its environmental profile.</p>
+          </div>
+          <p class="catalog-summary"><span class="dot"></span><span id="catalog-summary"></span></p>
+        </div>
+
+        <div class="notice" role="note">
+          <span data-icon="info" data-size="16"></span>
+          Illustrative demo data. Scores are fictional examples, not verified measurements or a basis for specification.
+        </div>
+
+        <div class="workspace">
+          <!-- Catalog -->
+          <section class="card catalog" aria-labelledby="catalog-title">
+            <div class="catalog-controls">
+              <div class="catalog-title">
+                <h2 id="catalog-title">All materials <span class="count" id="catalog-count"></span></h2>
+                <span class="view-state">Library view</span>
+              </div>
+
+              <div class="search-sort">
+                <label class="search">
+                  <span data-icon="search" data-size="17"></span>
+                  <span class="visually-hidden">Search materials</span>
+                  <input id="search" type="search" placeholder="Search materials or families…" autocomplete="off" />
+                  <kbd id="search-shortcut">Ctrl K</kbd>
+                </label>
+                <label class="sort">
+                  <span data-icon="sort" data-size="15"></span>
+                  <span class="visually-hidden">Sort materials</span>
+                  <select id="sort">
+                    <option value="default">Default order</option>
+                    <option value="name">Name A–Z</option>
+                    <option value="carbon">Lowest carbon</option>
+                    <option value="recyclability">Most recyclable</option>
+                    <option value="energy">Lowest energy</option>
+                  </select>
+                  <span class="sort-chevron" data-icon="chevronDown" data-size="14"></span>
+                </label>
+              </div>
+
+              <div class="filters" id="filters" role="group" aria-label="Filter by family"></div>
+
+              <p class="score-guidance">Demo scale 0–100 · Carbon &amp; energy: lower is better · Recyclability: higher is better</p>
+            </div>
+
+            <div class="table" role="table" aria-label="Materials">
+              <div class="row row-head" role="row">
+                <span role="columnheader">Material</span>
+                <span role="columnheader">Family</span>
+                <span role="columnheader" class="score-col">Carbon <span data-icon="arrowDown" data-size="11"></span></span>
+                <span role="columnheader" class="score-col">Recyclability <span data-icon="arrowUp" data-size="11"></span></span>
+                <span role="columnheader" class="score-col">Energy <span data-icon="arrowDown" data-size="11"></span></span>
+                <span aria-hidden="true"></span>
+              </div>
+              <div id="material-rows" role="rowgroup"></div>
+            </div>
+
+            <div class="catalog-footer">
+              <span id="showing"></span>
+              <span id="selected-label" class="selected-label"></span>
+            </div>
+          </section>
+
+          <!-- Profile -->
+          <aside class="card profile" id="profile" aria-live="polite" aria-label="Material profile"></aside>
+        </div>
+      </section>
+
+      <!-- ============ Understanding impact ============ -->
+      <section class="page" data-page="impact" hidden>
+        <div class="intro">
+          <div>
+            <p class="eyebrow">Understanding impact</p>
+            <h1 class="page-title">Three ways to read a material.</h1>
+            <p class="page-description">Each material in the library is scored on three dimensions. Here is what they mean and how to use them.</p>
+          </div>
+        </div>
+
+        <div class="notice" role="note">
+          <span data-icon="info" data-size="16"></span>
+          Illustrative demo data. Scores are fictional examples, not verified measurements or a basis for specification.
+        </div>
+
+        <div class="impact-grid">
+          <article class="card impact-card">
+            <span class="impact-icon" data-icon="cloud" data-size="20"></span>
+            <h2>Carbon score</h2>
+            <p class="direction"><span data-icon="arrowDown" data-size="12"></span> Lower is better</p>
+            <p>The relative greenhouse-gas impact of producing the material: extraction, processing and manufacturing. A lower score means less climate impact per unit of material.</p>
+          </article>
+          <article class="card impact-card">
+            <span class="impact-icon" data-icon="recycle" data-size="20"></span>
+            <h2>Recyclability score</h2>
+            <p class="direction"><span data-icon="arrowUp" data-size="12"></span> Higher is better</p>
+            <p>The potential for the material to be recovered and made into new material at end of life. It depends on collection, sorting and whether the material keeps its quality.</p>
+          </article>
+          <article class="card impact-card">
+            <span class="impact-icon" data-icon="zap" data-size="20"></span>
+            <h2>Energy score</h2>
+            <p class="direction"><span data-icon="arrowDown" data-size="12"></span> Lower is better</p>
+            <p>The relative energy demand of producing the material. High-temperature processes such as smelting, melting and firing push this score up.</p>
+          </article>
+        </div>
+
+        <section class="card how-to">
+          <h2>Compare the same function</h2>
+          <p>Compare equal function and service life, not just material names. A material that lasts twice as long, or can be repaired, can outperform one with better scores on paper. These example indices have no physical units or verified dataset; they are not lifecycle assessment results.</p>
+          <a class="button" href="#/">Open the materials explorer <span data-icon="arrowRight" data-size="16"></span></a>
+        </section>
+      </section>
+
+      <!-- Beyond the score -->
+      <section class="beyond" aria-labelledby="beyond-title">
+        <div>
+          <p class="eyebrow">Beyond the score</p>
+          <h2 id="beyond-title">A material is only part of the story.</h2>
+        </div>
+        <div class="beyond-item">
+          <h3><span data-icon="factory" data-size="16"></span> How it is made</h3>
+          <p>Recycled content, production methods and the energy mix matter.</p>
+        </div>
+        <div class="beyond-item">
+          <h3><span data-icon="truck" data-size="16"></span> How far it travels</h3>
+          <p>Weight, transport distance and local sourcing affect the footprint.</p>
+        </div>
+        <div class="beyond-item">
+          <h3><span data-icon="refresh" data-size="16"></span> What happens next</h3>
+          <p>Longer use, repair and a realistic recovery route can change the outcome.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Forma / Material intelligence, with context.</span>
+      <span>Exploration, not certification. No material is sustainable in every application.</span>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/icons.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
