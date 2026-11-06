@@ -3,3 +3,7 @@ node_modules/
 Thumbs.db
 .vscode/
 *.log
+.venv/
+__pycache__/
+.pytest_cache/
+.streamlit/secrets.toml

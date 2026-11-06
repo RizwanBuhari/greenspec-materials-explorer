@@ -51,7 +51,7 @@ Font: Inter (400 / 500 / 600). Icons: Lucide (sprout, search, info, chevron-righ
 - Footer band copy: "BEYOND THE SCORE / A material is only part of the story." · How it is made: "Recycled content, production methods and the energy mix matter." · How far it travels: "Weight, transport distance and local sourcing affect the footprint." · What happens next: "Longer use, repair and a realistic recovery route can change the outcome."
 - Page footer: "Forma / Material intelligence, with context." · "Exploration, not certification. No material is sustainable in every application."
 
-## Open issues / to confirm with team
-- Design brand name is **"Forma"** but the project is **GreenSpec AI**. Which one do we use?
-- Swatch images in Figma are AI image prompts, not real files. We need real photos or textures.
-- The design doesn't show the **input form** (Task 2) yet. Check the brief for the required fields.
+## Differences from the design
+- Brand is GreenSpec AI (the project's name) rather than "Forma"; the demo badge and "JD" avatar are gone.
+- Scores use the team's 0-10 scale, and a new "Assess a product" page holds the brief's form.
+- Swatches and profile images are CSS textures, because the Figma images are not exportable files.

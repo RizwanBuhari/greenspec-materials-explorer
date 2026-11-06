@@ -1,0 +1,16 @@
+Material,Carbon_Score,Recyclability_Score,Energy_Score
+Steel,6,9,7
+Aluminium,8,9,9
+Concrete,6,4,3
+Glass,4,8,6
+Plastic (PET),6,5,6
+Paper / Cardboard,2,8,3
+Leather,8,3,6
+Copper,6,9,7
+Brick,4,3,5
+Rubber,5,3,5
+Cotton fabric,4,4,4
+Polyester fabric,6,3,6
+PVC,6,2,5
+Wood,3,7,3
+Clay,4,5,5
