@@ -1,0 +1,15 @@
+[theme]
+base = "light"
+primaryColor = "#244D3E"
+backgroundColor = "#F4F3EE"
+secondaryBackgroundColor = "#FEFEFB"
+textColor = "#24392F"
+borderColor = "#DEDFD6"
+baseRadius = "6px"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

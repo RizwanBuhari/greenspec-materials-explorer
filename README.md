@@ -1,35 +1,61 @@
-# Forma · Materials explorer (GreenSpec AI, Group 4)
+# GreenSpec AI
 
-Web app built from Rayyan's Figma design ([design/materials-explorer.png](design/materials-explorer.png)).
+AI-assisted sustainable product design advisor (Group 4, AI Lab project).
 
-## Run it
-Double-click `index.html`, or serve the folder:
+A user describes a product and gets a sustainability score, greener alternatives from Claude, the regulations to check, and a downloadable PDF report.
+
+## Run it locally
 
 ```
-npx serve .        # or: python -m http.server 8000
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
-No build step and no dependencies (Inter font loads from Google Fonts).
+Then open http://localhost:8501. The app works without a Claude API key, except for the AI suggestions. To turn them on, copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml` and add your key. Never commit that file.
 
-## Files
-| File | What it is |
-|---|---|
-| `index.html` | Page structure: nav, explorer page, "Understanding impact" page, footer |
-| `css/styles.css` | All styling. Colours are CSS variables at the top (from Figma) |
-| `js/data.js` | **The materials.** Edit this to change materials, scores and text |
-| `js/app.js` | Search, filters, sort, selection, routing (`#/materials/wood`, `#/impact`) |
-| `js/icons.js` | Lucide icons used in the design |
-| `design/` | Figma export and design notes |
+To run the tests: `pip install -r requirements-dev.txt`, then `pytest`.
 
-## Updating the data
-Each material in `js/data.js` has `name`, `family`, `group` (filter chip), `scores`
-(carbon / recyclability / energy, 0–100), `description`, `tradeoff`, and 3 `tips`.
-Swatches are CSS textures; add `image: "assets/materials/<id>.jpg"` to use a real photo.
+## Put it online (Streamlit Community Cloud)
 
-Bar colour is automatic: green when favourable (carbon/energy < 50, recyclability ≥ 50), bronze otherwise.
+1. Push this repo to GitHub.
+2. At [share.streamlit.io](https://share.streamlit.io), choose **Create app** and pick this repo, branch `main`, main file `app.py`.
+3. Under **Advanced settings**, paste the contents of your `secrets.toml` into **Secrets**, then deploy.
 
-## Still to do
-- Replace demo data with the 15 materials from the team's Excel sheet
-- Task 2: input form + database (see GreenSpec brief)
-- Confirm the app name: "Forma" (design) vs "GreenSpec AI" (project)
-- Real material photos
+Set a monthly spend limit in the Claude Console as well. The app is public, and each suggestion is billed to the key. Repeated products reuse a saved answer, and `AI_DAILY_LIMIT` caps new requests (100 a day by default).
+
+## Who edits what
+
+| To change | Edit | Stream |
+|---|---|---|
+| Materials and scores | `data/materials.csv`, or set `GOOGLE_SHEET_CSV_URL` to read a published Google Sheet | Mech / Elec / Civil |
+| Score weights and bands | `WEIGHTS` and `BANDS` in `greenspec/scoring.py` | Data Science |
+| Regulations (3 to 4 points per market) | `data/regulations.json` | BBA |
+| Material descriptions, trade-offs, tips | `data/material_profiles.json` | Mech / Elec / Civil |
+| What Claude is asked | `SYSTEM_PROMPT` and `build_prompt` in `greenspec/ai.py` | CS / Engineering |
+| Report layout | `greenspec/report.py` | BBA / CS |
+| Look and feel | `assets/style.css` and `.streamlit/config.toml` | CS |
+
+## How the score works
+
+The sheet rates each material 0 to 10. Carbon and energy are flipped so higher is always better (`10 - rating`), then:
+
+`score = (carbon points x 40% + recyclability x 30% + energy points x 30%) x 10`
+
+The result is out of 100: 70 or more is Strong, 50 to 69 is Moderate, and below 50 is Low.
+
+## Layout
+
+```
+app.py               Entry point: page setup and navigation
+greenspec/views.py   The three pages
+greenspec/scoring.py Sustainability score
+greenspec/data.py    Loads materials and regulations
+greenspec/ai.py      Claude suggestions
+greenspec/report.py  PDF report
+data/                Materials database and written content
+tests/               Scoring, data, report and full-app tests
+design/              Rayyan's Figma export and notes
+prototype/           The earlier static HTML version, kept for reference
+```
