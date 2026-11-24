@@ -1,23 +1,13 @@
-"""Greener-alternative suggestions from Gemini."""
+"""Greener-alternative suggestions from an open model served by Groq."""
 
 from collections.abc import Iterator
 
-import httpx2
-from google import genai
-from google.genai import errors, types
+import groq
 
 from greenspec.data import Material
 
-DEFAULT_MODEL = "gemini-3.8-flash"
-MAX_OUTPUT_TOKENS = 8192  # Includes Gemini's thinking, so it is set well above the length of the answer.
-
-BLOCKED = {
-    types.FinishReason.SAFETY,
-    types.FinishReason.PROHIBITED_CONTENT,
-    types.FinishReason.BLOCKLIST,
-    types.FinishReason.SPII,
-    types.FinishReason.RECITATION,
-}
+DEFAULT_MODEL = "openai/gpt-oss-120b"
+MAX_COMPLETION_TOKENS = 4096  # Includes the model's hidden reasoning, so it is set well above the answer's length.
 
 SYSTEM_PROMPT = """You advise small manufacturers and product designers on greener material choices.
 
@@ -65,29 +55,36 @@ def stream_suggestions(
     """Yields the reply as it is written. Raises AIError if it cannot be completed."""
     finish_reason = None
     try:
-        client = genai.Client(api_key=api_key, http_options=types.HttpOptions(base_url=base_url) if base_url else None)
-        config = types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, max_output_tokens=MAX_OUTPUT_TOKENS)
-        for chunk in client.models.generate_content_stream(model=model, contents=prompt, config=config):
-            if chunk.prompt_feedback and chunk.prompt_feedback.block_reason:
-                raise AIError("Gemini declined to answer this request. Try rewording the product details.")
-            if chunk.candidates:
-                finish_reason = chunk.candidates[0].finish_reason or finish_reason
-            if chunk.text:
-                yield chunk.text
-    except errors.ClientError as error:
-        if error.code in (401, 403) or "api key" in (error.message or "").lower():
-            raise AIError(f"The app's Gemini API key was rejected: {error.message}") from error
-        if error.code == 404:
-            raise AIError(f"The Gemini model '{model}' was not found.") from error
-        if error.code == 429:
-            raise AIError("Gemini is receiving too many requests right now. Please try again shortly.") from error
-        raise AIError(f"Gemini returned an error ({error.code}). Please try again.") from error
-    except errors.APIError as error:
-        raise AIError(f"Gemini returned an error ({error.code}). Please try again.") from error
-    except httpx2.TransportError as error:
-        raise AIError("Could not reach Gemini. Check the connection and try again.") from error
+        client = groq.Groq(api_key=api_key, base_url=base_url)
+        stream = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+            max_completion_tokens=MAX_COMPLETION_TOKENS,
+            reasoning_effort="medium",
+            include_reasoning=False,
+            stream=True,
+        )
+        for chunk in stream:
+            if not chunk.choices:
+                continue
+            choice = chunk.choices[0]
+            finish_reason = choice.finish_reason or finish_reason
+            if choice.delta.content:
+                yield choice.delta.content
+    except groq.AuthenticationError as error:
+        raise AIError("The app's Groq API key was rejected.") from error
+    except groq.PermissionDeniedError as error:
+        raise AIError("The app's Groq API key does not have access to this model.") from error
+    except groq.NotFoundError as error:
+        raise AIError(f"The model '{model}' was not found on Groq.") from error
+    except groq.RateLimitError as error:
+        raise AIError("The AI service is receiving too many requests right now. Please try again shortly.") from error
+    except groq.APIStatusError as error:
+        raise AIError(f"The AI service returned an error ({error.status_code}). Please try again.") from error
+    except groq.APIConnectionError as error:
+        raise AIError("Could not reach the AI service. Check the connection and try again.") from error
 
-    if finish_reason in BLOCKED:
-        raise AIError("Gemini declined to answer this request. Try rewording the product details.")
-    if finish_reason == types.FinishReason.MAX_TOKENS:
+    if finish_reason == "content_filter":
+        raise AIError("The AI declined to answer this request. Try rewording the product details.")
+    if finish_reason == "length":
         yield "\n\n*This answer was cut short.*"

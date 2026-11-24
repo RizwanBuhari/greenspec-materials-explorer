@@ -162,16 +162,16 @@ def _generate_suggestions(assessment: dict, materials: list[Material]) -> None:
         st.session_state.ai_text = store.answers[key]
         return
 
-    api_key = get_secret("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    api_key = get_secret("GROQ_API_KEY") or os.environ.get("GROQ_API_KEY")
     if not api_key:
-        st.session_state.ai_error = "AI suggestions are not connected yet: the app has no Gemini API key."
+        st.session_state.ai_error = "AI suggestions are not connected yet: the app has no Groq API key."
         return
     if not store.try_start_call(int(get_secret("AI_DAILY_LIMIT", DEFAULT_AI_DAILY_LIMIT))):
         st.session_state.ai_error = "The app has reached its daily limit for AI suggestions. Please try again tomorrow."
         return
 
     prompt = ai.build_prompt(*key, materials)
-    model = get_secret("GEMINI_MODEL", ai.DEFAULT_MODEL)
+    model = get_secret("GROQ_MODEL", ai.DEFAULT_MODEL)
     try:
         text = st.write_stream(ai.stream_suggestions(prompt, api_key=api_key, model=model))
     except ai.AIError as error:
@@ -187,9 +187,9 @@ def _render_suggestions(assessment: dict, materials: list[Material]) -> None:
     if st.session_state.get("ai_text"):
         # A bold material name followed by a single newline would otherwise run into its explanation.
         st.markdown(re.sub(r"\*\*[ \t]*\n(?!\n)", "**\n\n", st.session_state.ai_text))
-        st.html('<p class="muted-note">Written by Gemini. An engineer should check that these are practical.</p>')
+        st.html('<p class="muted-note">Written by AI. An engineer should check that these are practical.</p>')
     elif not st.session_state.get("ai_error"):
-        with st.spinner("Gemini is reviewing your product…"):
+        with st.spinner("The AI is reviewing your product…"):
             _generate_suggestions(assessment, materials)
     if st.session_state.get("ai_error"):
         st.warning(st.session_state.ai_error)

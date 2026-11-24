@@ -100,6 +100,7 @@ def test_report_handles_no_ai_text_and_non_latin_input():
 
 def test_clean_replaces_typographic_characters():
     assert _clean("a – b’s “c”") == "a - b's \"c\""
+    assert _clean("trade‑off, 3 vs 6") == "trade-off, 3 vs 6"
 
 
 def test_data_files_exist():

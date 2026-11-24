@@ -34,7 +34,7 @@ def submit(at, product="", material=None, process="", country=None):
 def no_api_key(monkeypatch):
     # Ignore any local .streamlit/secrets.toml so tests never call the real API.
     monkeypatch.setattr("greenspec.views.get_secret", lambda name, default=None: default)
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
 
 
 def test_form_has_four_fields_and_shows_no_result_yet():
@@ -57,35 +57,35 @@ def test_ten_products(product, material, process, country, expected):
     assert not at.exception
     assert at.session_state.assessment["total"] == expected
     # Without a key the app explains itself rather than failing, and the rest still works.
-    assert "no Gemini API key" in at.warning[0].value
+    assert "no Groq API key" in at.warning[0].value
     assert not any(b.label == "Try again" for b in at.button)
 
 
 def test_suggestions_are_shown_and_saved(monkeypatch):
-    def fake_gemini(prompt, api_key, model):
+    def fake_ai(prompt, api_key, model):
         assert "This product uses Wood." in prompt
         yield "**Bamboo**\nGrows fast."
 
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
-    monkeypatch.setattr("greenspec.ai.stream_suggestions", fake_gemini)
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    monkeypatch.setattr("greenspec.ai.stream_suggestions", fake_ai)
     at = submit(AppTest.from_file(APP, default_timeout=30).run(), "Oak shelf", "Wood", "Cut", "European Union")
     assert not at.exception
     assert at.session_state.ai_text == "**Bamboo**\nGrows fast."
     assert "Bamboo" in at.markdown[0].value and not at.warning
 
 
-def test_unreachable_gemini_shows_a_message_and_a_retry(monkeypatch):
+def test_unreachable_ai_shows_a_message_and_a_retry(monkeypatch):
     from greenspec.ai import AIError
 
-    def fake_gemini(prompt, api_key, model):
-        raise AIError("Could not reach Gemini. Check the connection and try again.")
+    def fake_ai(prompt, api_key, model):
+        raise AIError("Could not reach the AI service. Check the connection and try again.")
         yield  # Makes this a generator, like the real one.
 
-    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
-    monkeypatch.setattr("greenspec.ai.stream_suggestions", fake_gemini)
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    monkeypatch.setattr("greenspec.ai.stream_suggestions", fake_ai)
     at = submit(AppTest.from_file(APP, default_timeout=30).run(), "Glass jar", "Glass", "Blown", "European Union")
     assert not at.exception
-    assert "Could not reach Gemini" in at.warning[0].value
+    assert "Could not reach the AI service" in at.warning[0].value
     assert any(b.label == "Try again" for b in at.button)
     assert at.session_state.assessment["total"] == 60  # The rest of the result still works.
 
