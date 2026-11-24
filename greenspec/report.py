@@ -101,7 +101,7 @@ def build_report(assessment: dict, ai_text: str | None, regulations: dict[str, l
         pdf.cell(0, 7, f"{value:g} / 10", new_x="LMARGIN", new_y="NEXT")
 
     _heading(pdf, "Greener alternatives (AI suggestions)")
-    # Claude's replies use **bold** names, which multi_cell can render directly.
+    # Gemini's replies use **bold** names, which multi_cell can render directly.
     suggestions = re.sub(r"^#+\s*", "", ai_text, flags=re.MULTILINE) if ai_text else "No AI suggestions were generated."
     _paragraph(pdf, suggestions, markdown=True)
 
