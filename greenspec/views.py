@@ -170,7 +170,7 @@ def _generate_suggestions(assessment: dict, materials: list[Material]) -> None:
         st.session_state.ai_error = "The app has reached its daily limit for AI suggestions. Please try again tomorrow."
         return
 
-    prompt = ai.build_prompt(*key, materials)
+    prompt = ai.build_prompt(*key, materials, regulations_for(assessment["country"], load_regulations()))
     model = get_secret("GROQ_MODEL", ai.DEFAULT_MODEL)
     try:
         text = st.write_stream(ai.stream_suggestions(prompt, api_key=api_key, model=model))

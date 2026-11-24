@@ -221,7 +221,12 @@
 .stHtml .result-product { margin-top: 14px; font-size: 12px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
 .result-product strong { font-size: 14px; font-weight: 600; color: var(--text); }
 
-.st-key-card_ai [data-testid="stMarkdownContainer"] p { font-size: 13px; line-height: 1.6; }
+.st-key-card_ai [data-testid="stMarkdownContainer"] p,
+.st-key-card_ai [data-testid="stMarkdownContainer"] li { font-size: 13px; line-height: 1.6; }
+.st-key-card_ai [data-testid="stMarkdownContainer"] li { margin-bottom: 4px; }
+.st-key-card_ai [data-testid="stMarkdownContainer"] ul { margin-bottom: 14px; }
+/* A paragraph that is only bold text is an alternative's name, e.g. "1. Glass". */
+.st-key-card_ai [data-testid="stMarkdownContainer"] p > strong:only-child { font-size: 15px; color: var(--primary); }
 
 .stHtml .reg-name { margin: 12px 0 6px; font-size: 12px; font-weight: 600; color: var(--text); }
 .reg-list { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.6; color: var(--muted); }

@@ -70,10 +70,33 @@ def test_regulations_for_market_include_international():
     assert list(regulations_for("Other (international standards only)", rules)) == ["International"]
 
 
-def test_prompt_asks_the_briefs_question_and_includes_database():
-    prompt = build_prompt("Chair", "Steel", "Welded", "European Union", load_materials())
-    assert "This product uses Steel. Suggest two greener alternatives and explain why." in prompt
-    assert "Wood: carbon 3, recyclability 7, energy 3" in prompt
+def chair_prompt(material="Steel"):
+    rules = regulations_for("European Union", load_regulations())
+    return build_prompt("Chair", material, "Welded", "European Union", load_materials(), rules)
+
+
+def test_prompt_asks_the_briefs_question_and_includes_context():
+    prompt = chair_prompt()
+    assert "This product uses Steel. Suggest two greener alternatives and explain why" in prompt
+    assert "Overall GreenSpec score 52/100 (Moderate)" in prompt
+    assert "Carbon Border Adjustment Mechanism" in prompt
+
+
+def test_comparisons_follow_each_ratings_direction():
+    prompt = chair_prompt()
+    # Recyclability 8 is worse than steel's 9, even though carbon and energy improve.
+    assert "- Glass (Mineral): overall 60/100 (+8); carbon 4 vs 6 (better); recyclability 8 vs 9 (worse); energy 6 vs 7 (better)" in prompt
+    assert "- Copper (Metal): overall 52/100 (+0); carbon 6 vs 6 (same); recyclability 9 vs 9 (same); energy 7 vs 7 (same)" in prompt
+
+
+def test_lower_scoring_materials_are_kept_out_of_the_candidates():
+    candidates, rest = chair_prompt().split("EQUAL OR LOWER")
+    assert "Paper / Cardboard" in candidates and "Wood" in candidates
+    assert "Aluminium" in rest and "Aluminium" not in candidates
+
+
+def test_best_material_says_there_are_no_higher_candidates():
+    assert "None: the current material already has the highest score" in chair_prompt("Paper / Cardboard")
 
 
 ASSESSMENT = {
